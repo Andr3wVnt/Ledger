@@ -26,7 +26,7 @@ A simple single-user expense and income tracker built with Node.js, Express, and
 ### Installation
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Andr3wVnt/Ledger
 cd Ledger
 npm install sqlite3 sqlite express
 ```
@@ -50,10 +50,21 @@ The SQLite database is created automatically on the first launch.
 ```text
 .
 ├── controllers/
+│   └── transaction_controller.js
 ├── data/
+│   └── expenses.db
 ├── db/
+│   └── db.js
 ├── public/
+│   ├── css/
+│   │   └── style.css
+│   ├── js/
+│   │   ├── api.js
+│   │   └── app.js
+│   └── index.html
 ├── routes/
+│   └── transactions.js
+├── README.md
 └── server.js
 ```
 
