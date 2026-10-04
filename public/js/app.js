@@ -59,10 +59,13 @@ function populateCategoryDropdowns() {
 // shaped the way api.getTransactions() expects.
 // ---------------------------------------------
 function getActiveFilters() {
+    const startDate = filterStartDate.value.trim();
+    const endDate = filterEndDate.value.trim();
+
     return {
         category: filterCategory.value,
-        startDate: filterStartDate.value,
-        endDate: filterEndDate.value,
+        startDate: startDate ? parseDisplayDate(startDate) : "",
+        endDate: endDate ? parseDisplayDate(endDate) : "",
         minAmount: filterMinAmount.value,
         maxAmount: filterMaxAmount.value,
     };
@@ -84,6 +87,34 @@ function formatCurrency(value) {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
     });
+}
+
+// Converts "DD/MM/YYYY" (what the user types) into "YYYY-MM-DD"
+// (what the database and API expect). Returns null if the input
+// doesn't match the expected pattern.
+function parseDisplayDate(displayDate) {
+    const match = displayDate.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if (!match) return null;
+
+    const [, day, month, year] = match;
+    const d = Number(day),
+        m = Number(month),
+        y = Number(year);
+
+    if (m < 1 || m > 12 || d < 1 || d > 31) return null;
+
+    const isoCandidate = `${year}-${month}-${day}`;
+    const parsed = new Date(isoCandidate);
+    const isValid = parsed.toISOString().slice(0, 10) === isoCandidate;
+
+    return isValid ? isoCandidate : null;
+}
+
+// Converts stored "YYYY-MM-DD" into "DD/MM/YYYY" for display —
+// used both in the table and when populating the form for editing.
+function formatDate(isoDate) {
+    const [year, month, day] = isoDate.split("-");
+    return `${day}/${month}/${year}`;
 }
 
 // ---------------------------------------------
@@ -111,7 +142,7 @@ function renderTable(transactions) {
         const amountClass = tx.type === "expense" ? "expense" : "income";
 
         row.innerHTML = `
-      <td>${tx.date}</td>
+      <td>${formatDate(tx.date)}</td>
       <td><span class="type-tag ${tx.type}">${tx.type}</span></td>
       <td>${tx.category}</td>
       <td class="amount-col ${amountClass}">${sign}${formatCurrency(tx.amount)}</td>
@@ -177,7 +208,7 @@ async function enterEditMode(id) {
         form.amount.value = tx.amount;
         form.type.value = tx.type;
         form.category.value = tx.category;
-        form.date.value = tx.date;
+        form.date.value = formatDate(tx.date);
         form.note.value = tx.note || "";
 
         editingId = id;
@@ -248,9 +279,14 @@ function setupFormEvents() {
             amount: form.amount.value,
             type: form.type.value,
             category: form.category.value,
-            date: form.date.value,
+            date: parseDisplayDate(form.date.value), // convert before sending
             note: form.note.value.trim(),
         };
+
+        if (!payload.date) {
+            alert("Please enter a valid date as DD/MM/YYYY.");
+            return;
+        }
 
         try {
             if (editingId) {

@@ -80,9 +80,17 @@
                         </select>
                     </div>
 
+                    <!-- Fix: European date format -->
                     <div class="field">
-                        <label for="date">Date</label>
-                        <input type="date" id="date" name="date" required />
+                        <label for="date">Date (DD/MM/YYYY)</label>
+                        <input
+                            type="text"
+                            id="date"
+                            name="date"
+                            placeholder="DD/MM/YYYY"
+                            pattern="\d{2}/\d{2}/\d{4}"
+                            required
+                        />
                     </div>
 
                     <div class="field note-field">
@@ -123,13 +131,23 @@
                     </div>
 
                     <div class="field">
-                        <label for="filter-start-date">From</label>
-                        <input type="date" id="filter-start-date" />
+                        <label for="filter-start-date">from (dd/mm/yyyy)</label>
+                        <input
+                            type="text"
+                            id="filter-start-date"
+                            placeholder="dd/mm/yyyy"
+                            pattern="\d{2}/\d{2}/\d{4}"
+                        />
                     </div>
 
                     <div class="field">
-                        <label for="filter-end-date">To</label>
-                        <input type="date" id="filter-end-date" />
+                        <label for="filter-end-date">to (dd/mm/yyyy)</label>
+                        <input
+                            type="text"
+                            id="filter-end-date"
+                            placeholder="dd/mm/yyyy"
+                            pattern="\d{2}/\d{2}/\d{4}"
+                        />
                     </div>
 
                     <div class="field">
